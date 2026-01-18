@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 220 15% 12%;
+    --foreground: 0 0% 100%;
+
+    --card: 220 15% 18%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 220 15% 18%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 145 70% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 15% 25%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 220 15% 22%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 220 10% 35%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 30%;
+    --input: 220 15% 25%;
+    --ring: 145 70% 45%;
+
+    --radius: 0.75rem;
+
+    /* Calculator specific tokens */
+    --calc-body: 220 15% 15%;
+    --calc-body-border: 220 15% 25%;
+    --calc-screen: 75 30% 85%;
+    --calc-screen-text: 220 15% 15%;
+    --calc-button-number: 220 10% 30%;
+    --calc-button-number-hover: 220 10% 40%;
+    --calc-button-function: 200 15% 45%;
+    --calc-button-function-hover: 200 15% 55%;
+    --calc-button-operator: 25 90% 55%;
+    --calc-button-operator-hover: 25 90% 65%;
+    --calc-button-operator-active: 25 90% 70%;
+    --calc-button-text: 0 0% 100%;
+    --calc-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  .dark {
+    --background: 220 15% 8%;
+    --foreground: 0 0% 100%;
+
+    --card: 220 15% 15%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 220 15% 15%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 145 70% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 15% 22%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 220 15% 18%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 220 10% 35%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 25%;
+    --input: 220 15% 22%;
+    --ring: 145 70% 45%;
+
+    --calc-body: 220 15% 12%;
+    --calc-body-border: 220 15% 22%;
+    --calc-screen: 75 30% 85%;
+    --calc-screen-text: 220 15% 15%;
+    --calc-button-number: 220 10% 28%;
+    --calc-button-number-hover: 220 10% 38%;
+    --calc-button-function: 200 15% 40%;
+    --calc-button-function-hover: 200 15% 50%;
+    --calc-button-operator: 25 90% 55%;
+    --calc-button-operator-hover: 25 90% 65%;
+    --calc-button-operator-active: 25 90% 70%;
+    --calc-button-text: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
