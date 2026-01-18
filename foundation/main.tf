@@ -13,7 +13,7 @@ provider "scaleway" {
   zone   = "fr-par-1"
   region = "fr-par"
 }
-
+## nom du projet
 variable "project_name" {
   description = "Nom du projet"
   type        = string
