@@ -5,7 +5,7 @@ import { CalcDisplay } from "./CalcDisplay";
 type Operator = "+" | "-" | "×" | "÷" | null;
 
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "/api";
 
 export const Calculator = () => {
   const [display, setDisplay] = useState("0");
