@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: khalil-andre
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: europe-west1-docker.pkg.dev/polytech-dijon/polytech-dijon/calculatrice-frontend-khalil-andre:v1
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "4m"
+            memory: "32Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-svc
+  namespace: khalil-andre
+spec:
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 80

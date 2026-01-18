@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: khalil-andre 
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: europe-west1-docker.pkg.dev/polytech-dijon/polytech-dijon/calculatrice-backend-khalil-andre:v1
+        ports:
+        - containerPort: 5000
+        env:
+        
+        - name: RABBITMQ_HOST
+          value: "rabbitmq-svc" 
+        - name: REDIS_HOST
+          value: "redis-svc"    
+        resources:
+          requests:
+            cpu: "4m"
+            memory: "32Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-svc
+  namespace: khalil-andre
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 5000
+    targetPort: 5000

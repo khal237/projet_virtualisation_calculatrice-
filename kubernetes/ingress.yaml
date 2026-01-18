@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-calculatrice
+  namespace: khalil-andre
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: calculatrice-khalil-andre.polytech-dijon.kiowy.net
+    http:
+      paths:
+      # Règle 1 : Tout ce qui commence par /api va vers le Backend
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-svc
+            port:
+              number: 5000
+      # Règle 2 : Tout le reste (la racine /) va vers le Frontend
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-svc
+            port:
+              number: 80

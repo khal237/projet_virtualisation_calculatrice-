@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer
+  namespace: khalil-andre
+  labels:
+    app: consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consumer
+  template:
+    metadata:
+      labels:
+        app: consumer
+    spec:
+      containers:
+      - name: consumer
+        image: europe-west1-docker.pkg.dev/polytech-dijon/polytech-dijon/calculatrice-consumer-khalil-andre:v1
+        env:
+        - name: RABBITMQ_HOST
+          value: "rabbitmq-svc"
+        - name: REDIS_HOST
+          value: "redis-svc"
+        resources:
+          requests:
+            cpu: "4m"
+            memory: "32Mi"
