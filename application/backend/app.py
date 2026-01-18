@@ -51,7 +51,7 @@ def request_calculation():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-    # On retourne l'ID immédiatement au React
+    
     return jsonify({"task_id": task_id}), 202
 
 @app.route('/api/result/<task_id>', methods=['GET'])
@@ -66,3 +66,4 @@ def get_result(task_id):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
