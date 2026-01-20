@@ -4,7 +4,7 @@ import { CalcDisplay } from "./CalcDisplay";
 
 type Operator = "+" | "-" | "×" | "÷" | null;
 
-// On garde le chemin relatif pour la prod (Ingress) et le local (Nginx Proxy)
+
 const API_URL = "/api";
 
 export const Calculator = () => {
