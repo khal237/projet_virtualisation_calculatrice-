@@ -1,22 +1,23 @@
-import { useState } from "react";
+import { useState, KeyboardEvent } from "react";
 import { CalcButton } from "./CalcButton";
-import { CalcDisplay } from "./CalcDisplay";
 
 type Operator = "+" | "-" | "×" | "÷" | null;
-
-
 const API_URL = "/api";
 
 export const Calculator = () => {
+  // --- ÉTATS ---
   const [display, setDisplay] = useState("0");
   const [previousValue, setPreviousValue] = useState<number | null>(null);
   const [operator, setOperator] = useState<Operator>(null);
   const [waitingForOperand, setWaitingForOperand] = useState(false);
   const [activeOperator, setActiveOperator] = useState<Operator>(null);
+  
+  // ÉTATS PARTIE RÉCUPÉRATION
+  const [taskIdInput, setTaskIdInput] = useState("");
+  const [resultMessage, setResultMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // --- LOGIQUE METIER ---
-
+  // --- LOGIQUE CALCULATRICE ---
   const mapOperator = (op: Operator): string => {
     switch (op) {
       case "×": return "*";
@@ -25,12 +26,13 @@ export const Calculator = () => {
     }
   };
 
-  // 1. Envoyer le calcul (POST) -> Affiche l'ID
   const submitCalculation = async (a: number, b: number, op: Operator) => {
+    if (loading) return; 
+
     try {
       setLoading(true);
       setDisplay("Envoi...");
-
+      
       const response = await fetch(`${API_URL}/calculate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -41,61 +43,33 @@ export const Calculator = () => {
       
       const data = await response.json();
       
-      // ICI : On affiche directement l'ID sur l'écran de la calculatrice
       setDisplay(data.task_id);
+      setTaskIdInput(data.task_id); 
+      // On efface le message du bas pour inviter à cliquer
+      setResultMessage(null); 
       
       setLoading(false);
     } catch (error) {
       console.error(error);
-      setDisplay("Err Envoi");
+      setDisplay("Erreur");
       setLoading(false);
     }
   };
 
-  // 2. Récupérer le résultat (GET) -> Affiche le nombre
-  const fetchResult = async (taskId: string) => {
-    try {
-      setLoading(true);
-      
-      const response = await fetch(`${API_URL}/result/${taskId}`);
-      
-      if (response.status === 404) {
-        // Si pas encore prêt, on prévient l'utilisateur
-        const currentId = display; // On garde l'ID en mémoire
-        setDisplay("En cours...");
-        setTimeout(() => setDisplay(currentId), 1500); // On réaffiche l'ID après
-      } else if (response.ok) {
-        const data = await response.json();
-        if (data.status === "completed") {
-          setDisplay(String(data.result)); // Affiche enfin le résultat !
-        }
-      } else {
-        setDisplay("Inconnu");
-      }
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-      setDisplay("Err Réseau");
-      setLoading(false);
-    }
+  const performOperation = (nextOperator: Operator) => {
+    const inputValue = parseFloat(display);
+    if (previousValue === null) {
+      setPreviousValue(inputValue);
+    } 
+    setWaitingForOperand(true);
+    setOperator(nextOperator);
+    setActiveOperator(nextOperator);
   };
 
-  // --- GESTION DES TOUCHES ---
-
-  // Le bouton "=" devient intelligent
-  const handleEqualsOrFetch = () => {
-    // Cas A : L'écran affiche un ID (contient des tirets ou lettres) -> On veut le résultat
-    if (isNaN(Number(display)) && display.includes("-")) {
-      fetchResult(display);
-      return;
-    }
-
-    // Cas B : On est en train de faire un calcul -> On l'envoie
+  const handleEquals = () => {
     const inputValue = parseFloat(display);
     if (previousValue !== null && operator) {
       submitCalculation(previousValue, inputValue, operator);
-      
-      // Reset des états de calcul, mais on garde l'ID à l'écran
       setPreviousValue(null);
       setOperator(null);
       setWaitingForOperand(true);
@@ -104,15 +78,12 @@ export const Calculator = () => {
   };
 
   const inputDigit = (digit: string) => {
-    if (loading) return;
-    
-    // Si l'écran affiche un ID ou une erreur, on efface tout au prochain chiffre
+    if (loading) return; 
     if (isNaN(Number(display)) && display !== ".") {
         setDisplay(digit);
         setWaitingForOperand(false);
         return;
     }
-
     if (waitingForOperand) {
       setDisplay(digit);
       setWaitingForOperand(false);
@@ -121,31 +92,84 @@ export const Calculator = () => {
       setDisplay(display === "0" ? digit : display + digit);
     }
   };
+  
+  const inputDecimal = () => { 
+    if (waitingForOperand) {
+        setDisplay("0.");
+        setWaitingForOperand(false);
+        return;
+    }
+    if (!display.includes(".")) {
+        setDisplay(display + "."); 
+    }
+  };
 
+  // --- LOGIQUE RÉCUPÉRATION  ---
+  const fetchManualResult = async () => {
+    if (!taskIdInput || loading) return;
+    
+    
+    if (resultMessage && resultMessage.includes("")) return;
+
+    try {
+      setLoading(true);
+    
+      
+      const response = await fetch(`${API_URL}/result/${taskIdInput}`);
+      
+      if (response.status === 404) {
+        setResultMessage("⏳ Pas encore prêt... (Réessaie)");
+      } else if (response.ok) {
+        const data = await response.json();
+        if (data.status === "completed") {
+          setResultMessage(` RÉSULTAT : ${data.result}`);
+        } else {
+           setResultMessage(` Statut : ${data.status}`);
+        }
+      } else {
+        setResultMessage(" ID Inconnu");
+      }
+    } catch (error) {
+      console.error(error);
+      setResultMessage(" Erreur connexion");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    //  Si l'utilisateur reste appuyé sur Entrée, on ignore les répétitions
+    if (e.repeat) return;
+
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      fetchManualResult();
+    }
+  };
+
+  // UI HELPERS
   const clear = () => {
     setDisplay("0");
     setPreviousValue(null);
     setOperator(null);
     setWaitingForOperand(false);
     setActiveOperator(null);
+    setResultMessage(null);
+    setTaskIdInput("");
     setLoading(false);
   };
 
-  // ... (Fonctions standard inchangées)
-  const inputDecimal = () => { if (!display.includes(".")) setDisplay(display + "."); };
-
-  // Helper pour ajuster la taille du texte si c'est un ID long
   const getDisplayClass = () => {
-    if (display.length > 15) return "text-xs"; // Tout petit pour l'ID
+    if (display.length > 15) return "text-xs";
     if (display.length > 10) return "text-lg";
     return "text-4xl";
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4 gap-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4 gap-8">
+      
+      {/* 1. CALCULATRICE */}
       <div className="w-full max-w-sm rounded-3xl border-4 border-calc-body-border bg-calc-body p-6 shadow-[var(--calc-shadow)]">
-        
-        {/* Écran modifié pour gérer la taille du texte */}
         <div className={`mb-4 flex h-20 items-center justify-end rounded-xl bg-calc-screen px-4 font-mono text-calc-screen-text shadow-inner ${getDisplayClass()} overflow-hidden break-all`}>
             {display}
         </div>
@@ -154,39 +178,61 @@ export const Calculator = () => {
           <CalcButton variant="function" onClick={clear}>AC</CalcButton>
           <CalcButton variant="function" onClick={() => {}}>±</CalcButton>
           <CalcButton variant="function" onClick={() => {}}>%</CalcButton>
-          <CalcButton variant="operator" isActive={activeOperator === "÷"} onClick={() => {}}>÷</CalcButton>
+          <CalcButton variant="operator" isActive={activeOperator === "÷"} onClick={() => performOperation("÷")}>÷</CalcButton>
 
           <CalcButton variant="number" onClick={() => inputDigit("7")}>7</CalcButton>
           <CalcButton variant="number" onClick={() => inputDigit("8")}>8</CalcButton>
           <CalcButton variant="number" onClick={() => inputDigit("9")}>9</CalcButton>
-          <CalcButton variant="operator" isActive={activeOperator === "×"} onClick={() => {}}>×</CalcButton>
+          <CalcButton variant="operator" isActive={activeOperator === "×"} onClick={() => performOperation("×")}>×</CalcButton>
 
           <CalcButton variant="number" onClick={() => inputDigit("4")}>4</CalcButton>
           <CalcButton variant="number" onClick={() => inputDigit("5")}>5</CalcButton>
           <CalcButton variant="number" onClick={() => inputDigit("6")}>6</CalcButton>
-          <CalcButton variant="operator" isActive={activeOperator === "-"} onClick={() => {}}>−</CalcButton>
+          <CalcButton variant="operator" isActive={activeOperator === "-"} onClick={() => performOperation("-")}>−</CalcButton>
 
           <CalcButton variant="number" onClick={() => inputDigit("1")}>1</CalcButton>
           <CalcButton variant="number" onClick={() => inputDigit("2")}>2</CalcButton>
           <CalcButton variant="number" onClick={() => inputDigit("3")}>3</CalcButton>
-          <CalcButton variant="operator" isActive={activeOperator === "+"} onClick={() => {}}>+</CalcButton>
+          <CalcButton variant="operator" isActive={activeOperator === "+"} onClick={() => performOperation("+")}>+</CalcButton>
 
           <CalcButton variant="number" className="col-span-2" onClick={() => inputDigit("0")}>0</CalcButton>
           <CalcButton variant="number" onClick={inputDecimal}>,</CalcButton>
-          
-          {/* Bouton "=" Intelligent */}
-          <CalcButton variant="operator" onClick={handleEqualsOrFetch}>
-             {/* Petit changement visuel : Si c'est un ID, on affiche "GET" ou une loupe, sinon "=" */}
-             {(isNaN(Number(display)) && display.includes("-")) ? "GET" : "="}
-          </CalcButton>
+          <CalcButton variant="operator" onClick={handleEquals}>=</CalcButton>
         </div>
       </div>
-      
-      {/* Petit texte d'aide */}
-      <p className="text-gray-400 text-sm text-center">
-        1. Tapez le calcul et faites <b>=</b> (Reçoit l'ID)<br/>
-        2. Appuyez sur <b>GET</b> pour voir le résultat.
-      </p>
+
+      {/* 2. CHAMP DE RÉCUPÉRATION */}
+      <div className="w-full max-w-sm p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+        <h3 className="text-lg font-bold mb-2 text-black"> Récupérer un résultat</h3>
+        <div className="flex gap-2">
+          <input 
+            type="text" 
+            value={taskIdInput}
+            onChange={(e) => {
+                setTaskIdInput(e.target.value);
+                // Si l'utilisateur change l'ID, on efface l'ancien résultat pour éviter la confusion
+                setResultMessage(null); 
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder="Collez l'ID ici et tapez Entrée..."
+            className="flex-1 p-2 border border-gray-300 rounded focus:border-orange-500 outline-none text-sm text-black placeholder-gray-500"
+          />
+          <button 
+            onClick={fetchManualResult}
+            disabled={loading} 
+            className={`font-bold py-2 px-4 rounded transition-colors ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-500 hover:bg-orange-600 text-white'}`}
+          >
+            {loading ? '...' : 'Vérifier'}
+          </button>
+        </div>
+        
+        {resultMessage && (
+          <div className="mt-4 p-3 bg-gray-100 rounded text-center font-mono text-black break-all font-bold">
+            {resultMessage}
+          </div>
+        )}
+      </div>
+
     </div>
   );
 };

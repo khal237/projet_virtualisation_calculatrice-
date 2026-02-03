@@ -1,5 +1,4 @@
 services:
-
   
   rabbitmq:
     image: rabbitmq:3.12-management
@@ -20,10 +19,9 @@ services:
       - "6379:6379"
 
   
-  
-  backend:
+  backend-svc:
     build: ./backend       
-    container_name: backend-api
+    container_name: backend-svc 
     ports:
       - "5000:5000"
     environment:
@@ -36,7 +34,6 @@ services:
         condition: service_started
 
 
-  
   consumer:
     build: ./consumer    
     container_name: backend-worker
@@ -50,11 +47,11 @@ services:
         condition: service_started
 
 
-  
   frontend:
     build: ./frontend      
     container_name: frontend-ui
     ports:
       - "80:80"
     depends_on:
-      - backend
+
+      - backend-svc
