@@ -71,17 +71,21 @@ Consumer (Worker Python) : Récupère les messages, effectue le calcul mathémat
 Redis : Base de données en mémoire utilisée pour stocker les résultats en attente de récupération.
 
 ## 🚀 Guide de Déploiement
-1. Construction des images Docker
+### 1. Construction des images Docker
 Les images sont construites localement et poussées sur le Google Artifact Registry.
 
-Bash
+```bash
 # Exemple pour le frontend (v10)
 docker build --no-cache -t europe-west1-docker.pkg.dev/polytech-dijon/polytech-dijon/calculatrice-frontend-khalil-andre:v10 ./application/frontend
 docker push europe-west1-docker.pkg.dev/polytech-dijon/polytech-dijon/calculatrice-frontend-khalil-andre:v10
-2. Déploiement sur Kubernetes
+
+#### 2. Pour la partie Kubernetes (Bash) :
+
+```text
+### 2. Déploiement sur Kubernetes
 L'ordre d'application est important pour assurer que les bases de données sont prêtes avant les applications.
 
-Bash
+```bash
 # 1. Création du Namespace
 kubectl apply -f kubernetes/namespace.yaml
 
@@ -97,14 +101,13 @@ kubectl apply -f kubernetes/frontend.yaml
 # 4. Exposition publique (Ingress)
 kubectl apply -f kubernetes/ingress-frontend.yaml
 kubectl apply -f kubernetes/ingress-backend.yaml
-🔧 Point Technique : Gestion de l'Ingress
-Un défi majeur du projet a été la gestion du routage sur un domaine unique. Nous avons mis en place une stratégie à deux Ingress :
 
-Ingress Frontend : Sert le contenu statique à la racine /.
+#### 3. Pour la partie Ingress (YAML) :
 
-Ingress Backend : Intercepte les requêtes commençant par /api. Une annotation spécifique permet de conserver le préfixe /api pour que l'application Flask route correctement la demande :
+```text
+### Extrait de ingress-backend.yaml
 
-YAML
-# Extrait de ingress-backend.yaml
+Une annotation spécifique permet de conserver le préfixe /api :
+
+```yaml
 nginx.ingress.kubernetes.io/rewrite-target: /api/$1
-Cette configuration assure que l'URL .../api/calculate est transmise correctement au conteneur backend sans être tronquée.
