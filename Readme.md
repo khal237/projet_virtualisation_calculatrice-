@@ -75,39 +75,42 @@ Redis : Base de données en mémoire utilisée pour stocker les résultats en at
 Les images sont construites localement et poussées sur le Google Artifact Registry.
 
 ```bash
-# Exemple pour le frontend (v10)
-docker build --no-cache -t europe-west1-docker.pkg.dev/polytech-dijon/polytech-dijon/calculatrice-frontend-khalil-andre:v10 ./application/frontend
-docker push europe-west1-docker.pkg.dev/polytech-dijon/polytech-dijon/calculatrice-frontend-khalil-andre:v10
-
+    # Exemple pour le frontend (v10)
+    docker build --no-cache -t europe-west1-docker.pkg.dev/polytech-dijon/polytech-dijon/calculatrice-frontend-khalil-andre:v10 ./application/frontend
+    docker push europe-west1-docker.pkg.dev/polytech-dijon/polytech-dijon/calculatrice-frontend-khalil-andre:v10
+```
 #### 2. Pour la partie Kubernetes (Bash) :
 
 ```text
-### 2. Déploiement sur Kubernetes
-L'ordre d'application est important pour assurer que les bases de données sont prêtes avant les applications.
-
+    ### 2. Déploiement sur Kubernetes
+    L'ordre d'application est important pour assurer que les bases de données sont prêtes avant les applications.
+```
 ```bash
-# 1. Création du Namespace
-kubectl apply -f kubernetes/namespace.yaml
+    # 1. Création du Namespace
+    kubectl apply -f kubernetes/namespace.yaml
 
-# 2. Infrastructure de données (Redis & RabbitMQ)
-kubectl apply -f kubernetes/redis.yaml
-kubectl apply -f kubernetes/rabbitmq.yaml
+    # 2. Infrastructure de données (Redis & RabbitMQ)
+    kubectl apply -f kubernetes/redis.yaml
+    kubectl apply -f kubernetes/rabbitmq.yaml
 
-# 3. Microservices (Backend, Consumer, Frontend)
-kubectl apply -f kubernetes/backend.yaml
-kubectl apply -f kubernetes/consumer.yaml
-kubectl apply -f kubernetes/frontend.yaml
+    # 3. Microservices (Backend, Consumer, Frontend)
+    kubectl apply -f kubernetes/backend.yaml
+    kubectl apply -f kubernetes/consumer.yaml
+    kubectl apply -f kubernetes/frontend.yaml
 
-# 4. Exposition publique (Ingress)
-kubectl apply -f kubernetes/ingress-frontend.yaml
-kubectl apply -f kubernetes/ingress-backend.yaml
+    # 4. Exposition publique (Ingress)
+    kubectl apply -f kubernetes/ingress-frontend.yaml
+    kubectl apply -f kubernetes/ingress-backend.yaml
+```
 
 #### 3. Pour la partie Ingress (YAML) :
 
 ```text
-### Extrait de ingress-backend.yaml
+    # Extrait de ingress-backend.yaml
 
-Une annotation spécifique permet de conserver le préfixe /api :
+    annotation spécifique permet de conserver le préfixe /api :
+```
 
 ```yaml
-nginx.ingress.kubernetes.io/rewrite-target: /api/$1
+    inx.ingress.kubernetes.io/rewrite-target: /api/$1
+```
