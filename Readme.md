@@ -51,7 +51,11 @@ L'organisation des fichiers reflète l'architecture distribuée de l'application
     │   └── Dockerfile          # Configuration de l'image Nginx/React
     │
     └── docker-compose.yml      # Environnement de test local
-🏗️ Architecture Technique
+```
+
+
+## 🏗️ Architecture Technique
+
 L'application repose sur 5 composants interconnectés :
 
 Frontend (React + Nginx) : Interface utilisateur. Envoie les calculs à l'API via /api/calculate.
@@ -66,7 +70,7 @@ Consumer (Worker Python) : Récupère les messages, effectue le calcul mathémat
 
 Redis : Base de données en mémoire utilisée pour stocker les résultats en attente de récupération.
 
-🚀 Guide de Déploiement
+## 🚀 Guide de Déploiement
 1. Construction des images Docker
 Les images sont construites localement et poussées sur le Google Artifact Registry.
 
