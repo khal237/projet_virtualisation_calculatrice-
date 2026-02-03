@@ -10,8 +10,8 @@ Le projet a été mené en séparant les responsabilités "Développement" (Dev)
 
 | Membre | Rôle Principal | Responsabilités détaillées |
 | :--- | :--- | :--- |
-| **André BITOTE** | **Fullstack Developer & DevOps** | • Développement du **Frontend React** (Interface & Appels API).<br>• Développement du **Backend Flask** et du **Consumer**.<br>• Conteneurisation (Rédaction des `Dockerfiles` optimisés).<br>• Intégration de la logique asynchrone (RabbitMQ & Redis). |
-| **Khalil NDAM** | **Cloud Architect & Kubernetes Ops** | • Conception de l'infrastructure **Kubernetes** (Manifestes YAML).<br>• Gestion du **Réseau & Ingress** (Règles de routage et réécriture d'URL).<br>• Déploiement sur Google Cloud Platform (GKE) & Terraform.<br>• Monitoring, Debugging et résolution des conflits de déploiement. |
+| **Khalil NDAM** | **Fullstack Developer & DevOps** | • Développement du **Frontend React** (Interface & Appels API).<br>• Développement du **Backend Flask** et du **Consumer**.<br>• Conteneurisation (Rédaction des `Dockerfiles` optimisés).<br>• Intégration de la logique asynchrone (RabbitMQ & Redis). |
+| **André BITOTE** | **Cloud Architect & Kubernetes Ops** | • Conception de l'infrastructure **Kubernetes** (Manifestes YAML).<br>• Gestion du **Réseau & Ingress** (Règles de routage et réécriture d'URL).<br>• Déploiement sur Google Cloud Platform (GKE) & Terraform.<br>• Monitoring, Debugging et résolution des conflits de déploiement. |
 
 ---
 
